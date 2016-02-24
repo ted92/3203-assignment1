@@ -51,8 +51,9 @@ select opt in $OPTIONS; do
 			set term pngcairo
 			gnuplot<< EOF
 			set terminal gif
+			set style line 1 lc rgb '#006ad' lt 1 lw 2 pt 7 ps 1.5
 			set output 'plot1.gif'
-			plot 'input_tab.dat'
+			plot 'input_tab.dat' with linespoints ls 1
 EOF
 		else
 			echo default Reduce settings
