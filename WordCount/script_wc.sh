@@ -20,9 +20,8 @@ select opt in $OPTIONS; do
 		if [ "$1" == "-n" ]; then
 			shift
 			#build the numbers array
-			input=( $@ )
-			len=${#input[@]}
-			numbers=${input[@]:0:$len}
+			numbers=( $@ )
+			len=${#numbers[@]}
 			#numbers now contains all the number for the execution of the MapReduce with different number of reducers
 			i=0
 			while [ $i -lt $len ]
@@ -37,7 +36,8 @@ select opt in $OPTIONS; do
 				#hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$(numbers[$i])
 				#declare the array durations
 				durations[$i]=$SECONDS
-				echo duration: $durations[$i] in i: $i
+				#to get the correct number in a loop: ${numbers[$i]}
+				echo number: ${numbers[$i]} in i: $i
 				#hadoop fs -copyToLocal Word_Count_outputdir
 				i=$[$i+1]
 			done
