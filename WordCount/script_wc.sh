@@ -19,7 +19,11 @@ select opt in $OPTIONS; do
 		#choose numbers of Reduce tasks for the evaluation from input parameter
 		if [ "$1" == "-n" ]; then
 			shift
-			#build the numbers array
+			#TODO:create the input_tab.dat that will be plotted
+			touch input_tab.dat
+			#table header
+			printf "%s %10s %10s\n" "#" "reduce" "time" > input_tab.dat
+			#buildthe numbers array
 			numbers=( $@ )
 			len=${#numbers[@]}
 			#numbers now contains all the number for the execution of the MapReduce with different number of reducers
@@ -36,6 +40,8 @@ select opt in $OPTIONS; do
 				#hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$(numbers[$i])
 				#declare the array durations
 				durations[$i]=$SECONDS
+				#write into input_tab.dat
+				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${durations[$i]}" >> input_tab.dat
 				#to get the correct number in a loop: ${numbers[$i]}
 				echo number: ${numbers[$i]} in i: $i
 				#hadoop fs -copyToLocal Word_Count_outputdir
@@ -46,7 +52,7 @@ select opt in $OPTIONS; do
 			gnuplot<< EOF
 			set terminal gif
 			set output 'plot1.gif'
-			plot for [i=1:words(durations)] word(durations, i).'.dat' lc rgb word(numbers, i)
+			plot 'input_tab.dat'
 EOF
 		else
 			echo default Reduce settings
