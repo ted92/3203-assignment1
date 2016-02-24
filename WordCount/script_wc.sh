@@ -16,30 +16,37 @@ select opt in $OPTIONS; do
 	if [ "$opt" = "input1" ]; then
 	#choose the first input: divine_comedy.txt
 		echo divine comedy
-		#clear all output and generate foler output
-		hadoop fs -rm -f Word_Count_outputdir
-		rm -r Word_Count_outputdir
-		#execute the Word Map
-		hadoop fs -copyFromLocal ./divine_comedy.txt divine_comedy.txt
-		#choose numbers of Reduce tasks for the evaluation
-		if [ "$1" != "-n" ]; then
-			echo paramter -n found
+		#choose numbers of Reduce tasks for the evaluation from input parameter
+		if [ "$1" == "-n" ]; then
 			shift
-			number=$1
-			#evaluate time
-			SECONDS=0
-			hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$number
-			duration=$SECONDS
+			#build the numbers array
+			input=( $@ )
+			len=${#input[@]}
+			numbers=${input[@]:0:$len}
+			#numbers now contains all the number for the execution of the MapReduce with different number of reducers
+			i=0
+			while [ $i -lt $len ]
+			do
+				#clear all output folders
+				hadoop fs -rm -r Word_Count_outputdir
+				rm -r Word_Count_outputdir
+				#execute the Word Map
+				#hadoop fs -copyFromLocal ./divine_comedy.txt divine_comedy.txt
+				#evaluate time
+				SECONDS=0
+				#hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$(numbers[$i])
+				#declare the array durations
+				durations[$i]=$SECONDS
+				echo duration: $durations[$i] in i: $i
+				#hadoop fs -copyToLocal Word_Count_outputdir
+				i=$[$i+1]
+			done
 			#generate the plot
 			set term pngcairo
 			gnuplot<< EOF
 			set terminal gif
 			set output 'plot1.gif'
-			plot '-' using 1:2
-				1 10
-				$number $duration
-				3 30
-				e
+			plot for [i=1:words(durations)] word(durations, i).'.dat' lc rgb word(numbers, i)
 EOF
 		else
 			echo default Reduce settings
@@ -59,7 +66,6 @@ EOF
 EOF
 		fi
 		echo "computation time: $(($duration / 60))m $(($duration % 60))s"
-		hadoop fs -copyToLocal Word_Count_outputdir
 		#generate the plot
 	elif [ "$opt" = "input2" ]; then
 		#chose the second input
