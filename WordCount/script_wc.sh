@@ -11,9 +11,9 @@
 # 3) generate a pdf with a graph showing the performance using gnuplot
 
 	
-OPTIONS="input1 input2 input3 quit"
+OPTIONS="divine_comedy input2 input3 quit"
 select opt in $OPTIONS; do
-	if [ "$opt" = "input1" ]; then
+	if [ "$opt" = "divine_comedy" ]; then
 	#choose the first input: divine_comedy.txt
 		echo divine comedy
 		#choose numbers of Reduce tasks for the evaluation from input parameter
@@ -34,17 +34,16 @@ select opt in $OPTIONS; do
 				hadoop fs -rm -r Word_Count_outputdir
 				rm -r Word_Count_outputdir
 				#execute the Word Map
-				hadoop fs -copyFromLocal ./divine_comedy.txt divine_comedy.txt
+				hadoop fs -copyFromLocal Inputdir/divine_comedy.txt divine_comedy.txt
 				#time elapsed in millisecs
 				time_start=$(date +%s%N)
-				hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$(numbers[$i])
+				hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=${numbers[$i]}
 				#declare the array durations containing the time elapsed
 				time_elapsed=$((($(date +%s%N) - $time_start)/1000000))
 				durations[$i]=$time_elapsed
 				#write into input_tab.dat
 				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${durations[$i]}" >> input_tab.dat
 				#to get the correct number in a loop: ${numbers[$i]}
-				echo number: ${numbers[$i]} in i: $i
 				hadoop fs -copyToLocal Word_Count_outputdir
 				i=$[$i+1]
 			done
@@ -57,7 +56,7 @@ select opt in $OPTIONS; do
 			plot 'input_tab.dat' with linespoints ls 1
 EOF
 		else
-			echo default Reduce settings
+			echo default Reduce settings using default number of reduce tasks
 			SECONDS=0
 			hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir
 			duration=$SECONDS
