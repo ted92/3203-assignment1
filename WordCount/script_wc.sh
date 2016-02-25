@@ -55,6 +55,7 @@ select opt in $OPTIONS; do
 			i=0
 			#add average line in the file input_tab.dat to plot
 			printf "\n" >> input_tab.dat
+			printf "%s %10s %10s\n" "#" "reduce" "time" >> input_tab.dat
 			#create a plot with the deviation standard
 			touch standard_dev.dat
 			printf "%s %20s %20s\n" "#" "standard_deviation" "time" > standard_dev.dat
