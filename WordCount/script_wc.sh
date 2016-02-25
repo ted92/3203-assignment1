@@ -53,14 +53,19 @@ select opt in $OPTIONS; do
 			#calculate average and then variance
 			avg=$(( sum/len ))
 			i=0
-			#add standard deviation part in the file to plot
+			#add average line in the file input_tab.dat to plot
 			printf "\n" >> input_tab.dat
+			#create a plot with the deviation standard
+			touch standard_dev.dat
+			printf "%s %20s %20s\n" "#" "standard_deviation" "time" > standard_dev.dat
 			while [ $i -lt $len ]
 			do
 				#variance
 				variance[$i]=$(( (durations[$i]-avg)*(durations[$i]-avg) ))
-				#add standard deviation to the input_tab file
-				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${variance[$i]}" >> input_tab.dat
+				#add average to the input_tab file
+				printf "%s %10d %10d\n" " " "${numbers[$i]}" "$avg" >> input_tab.dat
+				#add standard deviation to the standard_dev file
+				printf "%s %20d %20d\n" " " "${numbers[$i]}" "${variance[$i]}" >> standard_dev.dat
 				i=$[$i+1]
 			done
 			#generat plot
@@ -70,8 +75,7 @@ select opt in $OPTIONS; do
 			set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5
 			set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 5 ps 1.5
 			set output 'plot_divine_comedy.gif'
-			plot 'input_tab.dat' index 0 with linespoints ls 1, \
-			'' index 1 with linespoints 2
+			plot 'input_tab.dat' index 0 with linespoints ls 1
 EOF
 		else
 			echo default Reduce settings using default number of reduce tasks
