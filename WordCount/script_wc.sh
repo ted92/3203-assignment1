@@ -28,6 +28,7 @@ select opt in $OPTIONS; do
 			len=${#numbers[@]}
 			#numbers now contains all the number for the execution of the MapReduce with different number of reducers
 			i=0
+			sum=0
 			while [ $i -lt $len ]
 			do
 				#clear all output folders
@@ -45,34 +46,48 @@ select opt in $OPTIONS; do
 				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${durations[$i]}" >> input_tab.dat
 				#to get the correct number in a loop: ${numbers[$i]}
 				hadoop fs -copyToLocal Word_Count_outputdir
+				#sum for the average
+				sum=$(( sum+durations[$i] ))	
 				i=$[$i+1]
 			done
-			#generate the plot
+			#calculate average and then variance
+			avg=$(( sum/len ))
+			i=0
+			#add standard deviation part in the file to plot
+			printf "\n" >> input_tab.dat
+			while [ $i -lt $len ]
+			do
+				#variance
+				variance[$i]=$(( (durations[$i]-avg)*(durations[$i]-avg) ))
+				#add standard deviation to the input_tab file
+				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${variance[$i]}"
+				i=$[$i+1]
+			done
+			#generat plot
 			set term pngcairo
 			gnuplot<< EOF
 			set terminal gif
-			set style line 1 lc rgb '#006ad' lt 1 lw 2 pt 7 ps 1.5
-			set output 'plot1.gif'
-			plot 'input_tab.dat' with linespoints ls 1
+			set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5
+			set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 5 ps 1.5
+			set output 'plot_divine_comedy.gif'
+			plot 'input_tab.dat' index 0 with linespoints ls 1, index 1 with linespoints ls 2
 EOF
 		else
 			echo default Reduce settings using default number of reduce tasks
 			SECONDS=0
 			hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir
 			duration=$SECONDS
+			echo "computation time: $(($duration / 60))m $(($duration % 60))s"
 			#generate the plot
 			set term pngcairo
 			gnuplot<< EOF
 			set terminal gif
 			set output 'plot1.gif'
 			plot '-' using 1:2
-				1 10
 				$(($duration)* 10) 20
-				3 30
 				e
 EOF
 		fi
-		echo "computation time: $(($duration / 60))m $(($duration % 60))s"
 		#generate the plot
 	elif [ "$opt" = "input2" ]; then
 		#chose the second input
