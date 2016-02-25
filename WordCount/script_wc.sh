@@ -60,7 +60,7 @@ select opt in $OPTIONS; do
 				#variance
 				variance[$i]=$(( (durations[$i]-avg)*(durations[$i]-avg) ))
 				#add standard deviation to the input_tab file
-				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${variance[$i]}"
+				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${variance[$i]}" >> input_tab.dat
 				i=$[$i+1]
 			done
 			#generat plot
