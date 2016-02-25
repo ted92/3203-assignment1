@@ -69,7 +69,7 @@ select opt in $OPTIONS; do
 				printf "%s %20d %20d\n" " " "${numbers[$i]}" "${variance[$i]}" >> standard_dev.dat
 				i=$[$i+1]
 			done
-			#generat plot
+			#generate plot with average and performances
 			set term pngcairo
 			gnuplot<< EOF
 			set terminal gif
@@ -77,7 +77,13 @@ select opt in $OPTIONS; do
 			set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 5 ps 1.5
 			set output 'plot_divine_comedy.gif'
 			plot 'input_tab.dat' index 0 with linespoints ls 1
-			plot 'input_tab.dat' index 1 with linespoints ls 2
+EOF
+			#generate plot with standard deviation
+			gnuplot<< EOF
+			set terminal gif
+			set style line 1 lc rgb '#dd181f' lt 1 lw 2 pt 7 ps 1.5
+			set output 'plot_divine_comedy_standard_dev.gif'
+			plot 'standard_dev.dat' index 0 with linespoints ls 1
 EOF
 		else
 			echo default Reduce settings using default number of reduce tasks
