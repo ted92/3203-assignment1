@@ -19,7 +19,7 @@ select opt in $OPTIONS; do
 		#choose numbers of Reduce tasks for the evaluation from input parameter
 		if [ "$1" == "-n" ]; then
 			shift
-			#TODO:create the input_tab.dat that will be plotted
+			#create the input_tab.dat that will be plotted
 			touch input_tab.dat
 			#table header
 			printf "%s %10s %10s\n" "#" "reduce" "time" > input_tab.dat
@@ -34,17 +34,18 @@ select opt in $OPTIONS; do
 				hadoop fs -rm -r Word_Count_outputdir
 				rm -r Word_Count_outputdir
 				#execute the Word Map
-				#hadoop fs -copyFromLocal ./divine_comedy.txt divine_comedy.txt
-				#evaluate time
-				SECONDS=0
-				#hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$(numbers[$i])
-				#declare the array durations
-				durations[$i]=$SECONDS
+				hadoop fs -copyFromLocal ./divine_comedy.txt divine_comedy.txt
+				#time elapsed in millisecs
+				time_start=$(date +%s%N)
+				hadoop jar word_count.jar word_count.WordCount divine_comedy.txt Word_Count_outputdir -D mapred.reduce.tasks=$(numbers[$i])
+				#declare the array durations containing the time elapsed
+				time_elapsed=$((($(date +%s%N) - $time_start)/1000000))
+				durations[$i]=$time_elapsed
 				#write into input_tab.dat
 				printf "%s %10d %10d\n" " " "${numbers[$i]}" "${durations[$i]}" >> input_tab.dat
 				#to get the correct number in a loop: ${numbers[$i]}
 				echo number: ${numbers[$i]} in i: $i
-				#hadoop fs -copyToLocal Word_Count_outputdir
+				hadoop fs -copyToLocal Word_Count_outputdir
 				i=$[$i+1]
 			done
 			#generate the plot
