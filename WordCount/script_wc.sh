@@ -76,14 +76,14 @@ select opt in $OPTIONS; do
 			set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5
 			set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 5 ps 1.5
 			set output 'Plotdir/plot_divine_comedy.gif'
-			plot 'divine_comedy' index 0 with linespoints ls 1
+			plot 'Inputdir/input_tab.dat' index 0 with linespoints ls 1
 EOF
 			#generate plot with standard deviation
 			gnuplot<< EOF
 			set terminal gif
 			set style line 1 lc rgb '#dd181f' lt 1 lw 2 pt 7 ps 1.5
 			set output 'Plotdir/plot_divine_comedy_standard_dev.gif'
-			plot 'divine_comedy_sd' index 0 with linespoints ls 1
+			plot 'Inputdir/standard_dev.dat' index 0 with linespoints ls 1
 EOF
 		else
 			echo default Reduce settings using default number of reduce tasks
@@ -164,14 +164,14 @@ EOF
 			set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 ps 1.5
 			set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 5 ps 1.5
 			set output 'Plotdir/plot_project_gutenberg.gif'
-			plot 'project_Gutenberg' index 0 with linespoints ls 1
+			plot 'Inputdir/input_tab.dat' index 0 with linespoints ls 1
 EOF
 			#generate plot with standard deviation
 			gnuplot<< EOF
 			set terminal gif
 			set style line 1 lc rgb '#dd181f' lt 1 lw 2 pt 7 ps 1.5
 			set output 'Plotdir/plot_project_gutenberg_standard_dev.gif'
-			plot 'gutenberg_sd' index 0 with linespoints ls 1
+			plot 'Inputdir/standard_dev.dat' index 0 with linespoints ls 1
 EOF
 		else
 			echo default Reduce settings using default number of reduce tasks
